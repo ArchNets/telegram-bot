@@ -1,2 +1,3 @@
 export TOKEN="test"
-export PROXY="test"
+export API_BASE_URL="http://localhost:8080"
+export WEBAPP_URL="http://localhost:3002"
