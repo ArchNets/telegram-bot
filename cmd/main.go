@@ -11,6 +11,7 @@ import (
 	"github.com/archnets/telegram-bot/config"
 	"github.com/archnets/telegram-bot/internal/botapp"
 	"github.com/archnets/telegram-bot/internal/core"
+	"github.com/archnets/telegram-bot/internal/logger"
 	"github.com/archnets/telegram-bot/service"
 )
 
@@ -22,7 +23,8 @@ func main() {
 	cfg := config.Load()
 
 	if cfg.BotToken == "" {
-		log.Fatal("TELEGRAM_BOT_TOKEN is not set")
+		logger.Errorf("TELEGRAM_BOT_TOKEN is not set")
+		return
 	}
 
 	if cfg.APIBaseURL == "" {
@@ -41,6 +43,9 @@ func main() {
 		Auth:         authSvc,
 		Subscription: subSvc,
 		WebAppURL:    cfg.WebAppURL,
+
+		Debug:       cfg.BotDebug,
+		InitTimeout: time.Duration(cfg.BotTimeoutS) * time.Second,
 	}
 
 	// Create Telegram bot
@@ -48,8 +53,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create bot: %v", err)
 	}
-
-	log.Println("Starting Telegram bot...")
+	
+	logger.Infof("Starting Telegram bot...")
 	b.Start(ctx)
-	log.Println("Bot stopped")
+	logger.Infof("Bot stopped")
 }

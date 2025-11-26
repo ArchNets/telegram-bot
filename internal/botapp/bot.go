@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/archnets/telegram-bot/internal/botapp/commands/users"
 	"github.com/archnets/telegram-bot/internal/core"
+	"github.com/archnets/telegram-bot/internal/logger"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 )
@@ -13,16 +15,38 @@ type Dependencies struct {
 	Auth         *core.AuthService
 	Subscription *core.SubscriptionService
 	WebAppURL    string
+
+	// config-like values for the bot itself
+	Debug       bool
+	InitTimeout time.Duration
 }
 
 func NewBot(token string, deps Dependencies) (*bot.Bot, error) {
-	defaultHandler := func(ctx context.Context, b *bot.Bot, u *models.Update) {
-		handleDefault(ctx, b, u, deps)
+	// fallback if not set
+	initTimeout := deps.InitTimeout
+	if initTimeout == 0 {
+		initTimeout = 5 * time.Second
 	}
 
 	opts := []bot.Option{
-		bot.WithCheckInitTimeout(5 * time.Second),
-		bot.WithDefaultHandler(defaultHandler),
+		bot.WithCheckInitTimeout(initTimeout),
+		bot.WithDefaultHandler(func(ctx context.Context, b *bot.Bot, u *models.Update) {
+			users.DefaultHandler(ctx, b, u, users.Deps{
+				Auth:         deps.Auth,
+				Subscription: deps.Subscription,
+				WebAppURL:    deps.WebAppURL,
+			})
+		}),
+	}
+
+	// Only enable debug if configured
+	if deps.Debug {
+		opts = append(opts,
+			bot.WithDebug(),
+			bot.WithDebugHandler(func(format string, args ...any) {
+				logger.Debugf("telegram: "+format, args...)
+			}),
+		)
 	}
 
 	b, err := bot.New(token, opts...)
@@ -33,37 +57,27 @@ func NewBot(token string, deps Dependencies) (*bot.Bot, error) {
 	// /start
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact,
 		func(ctx context.Context, b *bot.Bot, u *models.Update) {
-			handleStart(ctx, b, u, deps)
+			users.HandleStart(ctx, b, u, users.Deps{
+				Auth:         deps.Auth,
+				Subscription: deps.Subscription,
+				WebAppURL:    deps.WebAppURL,
+			})
 		},
 	)
 
-	// /login <token>
-	b.RegisterHandler(bot.HandlerTypeMessageText, "/login", bot.MatchTypePrefix,
-		func(ctx context.Context, b *bot.Bot, u *models.Update) {
-			handleLogin(ctx, b, u, deps)
-		},
-	)
-
-	// /status
+	// /status example (if you have it)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/status", bot.MatchTypeExact,
 		func(ctx context.Context, b *bot.Bot, u *models.Update) {
-			handleStatus(ctx, b, u, deps)
+			users.HandleStatus(ctx, b, u, users.Deps{
+				Auth:         deps.Auth,
+				Subscription: deps.Subscription,
+				WebAppURL:    deps.WebAppURL,
+			})
 		},
 	)
 
-	// /configs
-	b.RegisterHandler(bot.HandlerTypeMessageText, "/configs", bot.MatchTypeExact,
-		func(ctx context.Context, b *bot.Bot, u *models.Update) {
-			handleConfigs(ctx, b, u, deps)
-		},
-	)
-
-	// /webapp - send Telegram Web App button (mini webapp frontend)
-	b.RegisterHandler(bot.HandlerTypeMessageText, "/webapp", bot.MatchTypeExact,
-		func(ctx context.Context, b *bot.Bot, u *models.Update) {
-			handleWebApp(ctx, b, u, deps)
-		},
-	)
+	// Admin commands later, once you really create commands/admins package
+	// b.RegisterHandler(... admins.HandleAdmin ...)
 
 	return b, nil
 }
