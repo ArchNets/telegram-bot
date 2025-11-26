@@ -1,0 +1,2 @@
+export TOKEN="test"
+export PROXY="test"
