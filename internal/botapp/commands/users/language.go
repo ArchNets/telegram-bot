@@ -4,9 +4,7 @@ import (
 	"context"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/archnets/telegram-bot/internal/auth"
 	"github.com/archnets/telegram-bot/internal/botapp/commands"
 	"github.com/archnets/telegram-bot/internal/i18n"
 	"github.com/archnets/telegram-bot/internal/logger"
@@ -15,15 +13,9 @@ import (
 )
 
 // HandleLanguage shows language selection buttons.
+// Note: Authentication is handled by middleware.
 func HandleLanguage(ctx context.Context, b *bot.Bot, u *models.Update, deps commands.Deps) {
 	if u.Message == nil {
-		return
-	}
-	lg := logger.ForUpdate(u)
-
-	if err := ensureAuthenticated(ctx, u.Message.From, deps); err != nil {
-		lg.Errorf("Auth error: %v", err)
-		sendError(ctx, b, u.Message.Chat.ID, u.Message.From.LanguageCode, "auth_error")
 		return
 	}
 
@@ -31,6 +23,7 @@ func HandleLanguage(ctx context.Context, b *bot.Bot, u *models.Update, deps comm
 }
 
 // HandleLanguageCallback handles inline button callback for language selection.
+// Note: Authentication is handled by middleware.
 func HandleLanguageCallback(ctx context.Context, b *bot.Bot, u *models.Update, deps commands.Deps) {
 	if u.CallbackQuery == nil {
 		return
@@ -47,29 +40,15 @@ func HandleLanguageCallback(ctx context.Context, b *bot.Bot, u *models.Update, d
 
 	lg.Debugf("Language callback: %s", lang)
 
-	// Ensure authenticated
+	// Get token from session (middleware ensures we're authenticated)
 	token := deps.Sessions.GetToken(cb.From.ID)
-	lg.Debugf("Token from session: len=%d", len(token))
-
 	if token == "" {
-		lg.Debugf("No token, authenticating...")
-		if err := ensureAuthenticated(ctx, &cb.From, deps); err != nil {
-			lg.Errorf("Auth error: %v", err)
-			answerCallback(ctx, b, cb.ID, "Authentication error", true)
-			return
-		}
-		token = deps.Sessions.GetToken(cb.From.ID)
-		lg.Debugf("Token after auth: len=%d", len(token))
-	}
-
-	if token == "" {
-		lg.Errorf("Token still empty after auth!")
-		answerCallback(ctx, b, cb.ID, "Authentication failed", true)
+		lg.Errorf("No token in session after middleware auth")
+		answerCallback(ctx, b, cb.ID, "Authentication error", true)
 		return
 	}
 
 	// Update language via API
-	lg.Debugf("Calling UpdateUserLanguage...")
 	if err := deps.API.UpdateUserLanguage(ctx, token, lang); err != nil {
 		lg.Errorf("Update lang error: %v", err)
 		answerCallback(ctx, b, cb.ID, "Failed to save", true)
@@ -114,29 +93,6 @@ func HandleLanguageCallback(ctx context.Context, b *bot.Bot, u *models.Update, d
 }
 
 // --- Helpers ---
-
-func ensureAuthenticated(ctx context.Context, user *models.User, deps commands.Deps) error {
-	if deps.Sessions.GetToken(user.ID) != "" {
-		return nil
-	}
-
-	token, err := deps.AuthClient.Authenticate(auth.TelegramUser{
-		ID:           user.ID,
-		Username:     user.Username,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		LanguageCode: user.LanguageCode,
-	})
-	if err != nil {
-		return err
-	}
-
-	deps.Sessions.Set(user.ID, &auth.Session{
-		Token:     token,
-		ExpiresAt: time.Now().Add(7 * 24 * time.Hour),
-	})
-	return nil
-}
 
 func sendLanguageSelection(ctx context.Context, b *bot.Bot, chatID int64, lang string) {
 	loc := i18n.Localizer(lang)

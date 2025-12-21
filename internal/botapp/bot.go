@@ -32,9 +32,6 @@ type Dependencies struct {
 	Sessions     auth.SessionStore
 }
 
-// HandlerFunc is the standard signature for all command handlers.
-type HandlerFunc func(ctx context.Context, b *bot.Bot, u *models.Update, deps commands.Deps)
-
 // NewBot creates and configures a new Telegram bot instance.
 func NewBot(token string, deps Dependencies, cfg Config) (*bot.Bot, error) {
 	if cfg.InitTimeout == 0 {
@@ -94,9 +91,14 @@ func clearBotUI(ctx context.Context, b *bot.Bot) {
 }
 
 func registerCommands(b *bot.Bot, deps commands.Deps) {
+	// /start handles its own auth (special first-time user flow)
 	register(b, "/start", users.HandleStart, deps)
-	register(b, "/status", users.HandleStatus, deps)
-	register(b, "/lang", users.HandleLanguage, deps)
+
+	// Commands with authentication middleware
+	register(b, "/status", commands.WithAuth(users.HandleStatus), deps)
+	register(b, "/lang", commands.WithAuth(users.HandleLanguage), deps)
+
+	// Admin commands
 	register(b, "/start_admin", admins.HandleStart, deps)
 }
 
@@ -105,13 +107,11 @@ func registerCallbacks(b *bot.Bot, deps commands.Deps) {
 		bot.HandlerTypeCallbackQueryData,
 		"lang:",
 		bot.MatchTypePrefix,
-		func(ctx context.Context, b *bot.Bot, u *models.Update) {
-			users.HandleLanguageCallback(ctx, b, u, deps)
-		},
+		wrapHandler(commands.WithAuth(users.HandleLanguageCallback), deps),
 	)
 }
 
-func register(b *bot.Bot, command string, handler HandlerFunc, deps commands.Deps) {
+func register(b *bot.Bot, command string, handler commands.HandlerFunc, deps commands.Deps) {
 	b.RegisterHandler(
 		bot.HandlerTypeMessageText,
 		command,
@@ -120,7 +120,7 @@ func register(b *bot.Bot, command string, handler HandlerFunc, deps commands.Dep
 	)
 }
 
-func wrapHandler(handler HandlerFunc, deps commands.Deps) bot.HandlerFunc {
+func wrapHandler(handler commands.HandlerFunc, deps commands.Deps) bot.HandlerFunc {
 	return func(ctx context.Context, b *bot.Bot, u *models.Update) {
 		handler(ctx, b, u, deps)
 	}

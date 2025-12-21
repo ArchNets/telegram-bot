@@ -23,6 +23,7 @@ type TelegramUser struct {
 	FirstName    string
 	LastName     string
 	LanguageCode string
+	PhotoURL     string // Direct URL to user's profile photo (optional)
 }
 
 // Client handles authentication with the backend.
@@ -66,7 +67,7 @@ func (c *Client) Authenticate(user TelegramUser) (string, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("auth failed: status %d", resp.StatusCode)
+		return "", fmt.Errorf("auth failed: status %d, body: %s", resp.StatusCode, string(bodyBytes))
 	}
 
 	var result struct {
@@ -76,6 +77,10 @@ func (c *Client) Authenticate(user TelegramUser) (string, error) {
 	}
 	if err := json.Unmarshal(bodyBytes, &result); err != nil {
 		return "", fmt.Errorf("decode response: %w", err)
+	}
+
+	if result.Data.Token == "" {
+		return "", fmt.Errorf("auth response missing token: %s", string(bodyBytes))
 	}
 
 	return result.Data.Token, nil
@@ -89,6 +94,7 @@ type authRequest struct {
 	FirstName  string `json:"first_name,omitempty"`
 	LastName   string `json:"last_name,omitempty"`
 	Lang       string `json:"lang,omitempty"`
+	PhotoURL   string `json:"photo_url,omitempty"`
 	Timestamp  int64  `json:"timestamp"`
 	Signature  string `json:"signature"`
 }
@@ -100,6 +106,7 @@ func (c *Client) buildAuthRequest(user TelegramUser) *authRequest {
 		FirstName:  user.FirstName,
 		LastName:   user.LastName,
 		Lang:       user.LanguageCode,
+		PhotoURL:   user.PhotoURL,
 		Timestamp:  time.Now().Unix(),
 	}
 	req.Signature = c.computeSignature(req)

@@ -83,39 +83,71 @@ BalanceNotFound = 20011
 
 ---
 
+## Middleware
+
+Middleware wraps handlers to add reusable functionality like authentication.
+
+### Available Middleware
+
+| Middleware | Description |
+|------------|-------------|
+| `WithAuth` | Authenticates user via backend API before handler runs |
+| `Chain` | Combines multiple middleware together |
+
+### Using Middleware
+
+Register commands with middleware in `bot.go`:
+
+```go
+// Commands that need authentication
+register(b, "/status", commands.WithAuth(users.HandleStatus), deps)
+register(b, "/lang", commands.WithAuth(users.HandleLanguage), deps)
+
+// Commands with custom auth flow (no middleware)
+register(b, "/start", users.HandleStart, deps)
+```
+
+### Creating New Middleware
+
+Add to `internal/botapp/commands/middleware.go`:
+
+```go
+func WithCustom(next HandlerFunc) HandlerFunc {
+    return func(ctx context.Context, b *bot.Bot, u *models.Update, deps Deps) {
+        // Pre-handler logic
+        next(ctx, b, u, deps)
+        // Post-handler logic
+    }
+}
+```
+
+---
+
 ## Handler Pattern
 
 All handlers should follow this structure:
 
 ```go
+// HandleXxx handles the /xxx command.
+// Note: Authentication is handled by middleware.
 func HandleXxx(ctx context.Context, b *bot.Bot, u *models.Update, deps commands.Deps) {
     // 1. Guard clause
     if u.Message == nil {
         return
     }
 
-    // 2. Get logger and language
-    lg := logger.ForUpdate(u)
+    // 2. Get language (user is already authenticated by middleware)
     lang := getLanguage(ctx, u.Message.From.ID, u.Message.From.LanguageCode, deps)
     loc := i18n.Localizer(lang)
 
-    // 3. Authenticate if needed
-    if err := ensureAuthenticated(ctx, u.Message.From, deps); err != nil {
-        sendError(ctx, b, u.Message.Chat.ID, lang, "auth_error")
-        return
-    }
-
-    // 4. Business logic
+    // 3. Business logic
     // ...
 
-    // 5. Send response
+    // 4. Send response
     _, _ = b.SendMessage(ctx, &bot.SendMessageParams{
         ChatID: u.Message.Chat.ID,
         Text:   i18n.T(loc, "message_key"),
     })
-
-    // 6. Log
-    lg.Infof("Command handled")
 }
 ```
 
