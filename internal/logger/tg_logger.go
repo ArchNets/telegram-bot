@@ -20,6 +20,10 @@ func ForUpdate(u *models.Update) TgLogger {
 	return TgLogger{chatID: chatID}
 }
 
+func ForUser(userID int64) TgLogger {
+	return TgLogger{chatID: userID}
+}
+
 func (l TgLogger) prefix() string {
 	if l.chatID == 0 {
 		return ""

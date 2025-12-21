@@ -1,23 +1,15 @@
 package core
 
-import (
-	"context"
+// SubscriptionService is a placeholder for subscription-related operations.
+type SubscriptionService struct{}
 
-	"github.com/archnets/telegram-bot/service"
-)
-
-type SubscriptionService struct {
-	api *service.APIClient
+// NewSubscriptionService creates a new subscription service.
+// The `_ any` parameter is for backwards compatibility.
+func NewSubscriptionService(_ any) *SubscriptionService {
+	return &SubscriptionService{}
 }
 
-func NewSubscriptionService(api *service.APIClient) *SubscriptionService {
-	return &SubscriptionService{api: api}
-}
-
-func (s *SubscriptionService) GetStatusText(ctx context.Context, tgID int64) (string, error) {
-	return s.api.GetStatus(ctx, tgID)
-}
-
-func (s *SubscriptionService) GetConfigsText(ctx context.Context, tgID int64) (string, error) {
-	return s.api.GetConfigs(ctx, tgID)
+// GetStatusText returns subscription status (placeholder).
+func (s *SubscriptionService) GetStatusText(tgID int64) string {
+	return "Status feature coming soon"
 }

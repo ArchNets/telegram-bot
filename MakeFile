@@ -1,0 +1,13 @@
+include .envrc
+MIGRATIONS_DIR=./internal/db/migrations
+
+# Start air for live reload
+.PHONY: start-dev
+start-dev:
+	@air
+
+# Create a new migration file
+# Usage: make migration name=create_users
+.PHONY: migration
+migration:
+	@migrate create -seq -ext sql -dir $(MIGRATIONS_DIR) $(name)

@@ -1,25 +1,51 @@
 package core
 
 import (
-	"context"
-	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/archnets/telegram-bot/internal/env"
 	"github.com/archnets/telegram-bot/internal/logger"
-	"github.com/archnets/telegram-bot/service"
 )
 
+// AuthService handles admin authorization checks.
 type AuthService struct {
-	api *service.APIClient
+	admins map[int64]struct{}
 }
 
-func NewAuthService(api *service.APIClient) *AuthService {
-	return &AuthService{api: api}
-}
-
-// LoginWithToken: handles basic validation then delegates to API client.
-func (s *AuthService) LoginWithToken(ctx context.Context, tgID int64, token string) error {
-	if token == "" {
-		logger.Errorf("token is empty for user %d", tgID)
-		return fmt.Errorf("token is empty")
+// NewAuthService creates a new auth service.
+// The `_ any` parameter is for backwards compatibility.
+func NewAuthService(_ any) *AuthService {
+	s := &AuthService{
+		admins: make(map[int64]struct{}),
 	}
-	return s.api.LoginWithToken(ctx, tgID, token)
+
+	raw := env.GetString("ADMINS_LIST", "")
+	if raw == "" {
+		logger.Warnf("ADMINS_LIST is empty")
+		return s
+	}
+
+	for _, p := range strings.Split(raw, ",") {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+
+		id, err := strconv.ParseInt(p, 10, 64)
+		if err != nil {
+			logger.Warnf("Invalid admin ID: %q", p)
+			continue
+		}
+		s.admins[id] = struct{}{}
+	}
+
+	logger.Infof("Loaded %d admin IDs", len(s.admins))
+	return s
+}
+
+// IsAdmin checks if a telegram ID is in the admin list.
+func (s *AuthService) IsAdmin(tgID int64) bool {
+	_, ok := s.admins[tgID]
+	return ok
 }

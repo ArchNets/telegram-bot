@@ -1,0 +1,38 @@
+{
+    "welcome": {
+        "other": "🐉 Hello and welcome to {{.BotName}} bot 👋"
+    },
+    "select_option": {
+        "other": "📌 Please select one of the options below to use the bot"
+    },
+    "click_login": {
+        "other": "📍 Click the button below to login to panel."
+    },
+    "login_button": {
+        "other": "Login to Panel"
+    },
+    "unknown_command": {
+        "other": "Unknown command. Try /start"
+    },
+    "admin_welcome": {
+        "other": "Welcome back, Admin! 👋"
+    },
+    "admin_commands": {
+        "other": "Available commands:\n/status - Check system status\n/configs - View configurations\n/webapp - Open web panel"
+    },
+    "access_denied": {
+        "other": "⛔ Access denied. You are not an admin."
+    },
+    "status_unavailable": {
+        "other": "Status is under construction 🚧"
+    },
+    "choose_language": {
+        "other": "🌐 Please choose your language:"
+    },
+    "language_saved": {
+        "other": "✅ Language preference saved!"
+    },
+    "auth_error": {
+        "other": "❌ Authentication error. Please try again."
+    }
+}

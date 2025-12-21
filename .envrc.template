@@ -1,3 +1,5 @@
 export TOKEN="test"
+export BOT_NAME_EN="Arch Net"
+export BOT_NAME_FA="آرچ نت"
 export API_BASE_URL="http://localhost:8080"
 export WEBAPP_URL="http://localhost:3002"

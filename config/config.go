@@ -9,8 +9,10 @@ import (
 
 type Config struct {
 	BotToken    string
+	BotNames    map[string]string // per-language bot names
 	APIBaseURL  string
 	WebAppURL   string
+	DBPath      string
 	BotDebug    bool
 	BotTimeoutS int // seconds for init timeout, e.g. 5
 }
@@ -28,9 +30,14 @@ func Load() Config {
 	}
 
 	return Config{
-		BotToken:    env.GetString("TELEGRAM_BOT_TOKEN", ""),
+		BotToken: env.GetString("TELEGRAM_BOT_TOKEN", ""),
+		BotNames: map[string]string{
+			"en": env.GetString("BOT_NAME_EN", "Arch Net"),
+			"fa": env.GetString("BOT_NAME_FA", "آرچ نت"),
+		},
 		APIBaseURL:  env.GetString("API_BASE_URL", ""),
 		WebAppURL:   env.GetString("WEBAPP_URL", ""),
+		DBPath:      env.GetString("DB_PATH", "./data/sessions.db"),
 		BotDebug:    botDebug,
 		BotTimeoutS: timeoutSec,
 	}
