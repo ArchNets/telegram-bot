@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/archnets/telegram-bot/internal/auth"
+	"github.com/archnets/telegram-bot/internal/i18n"
 	"github.com/archnets/telegram-bot/internal/logger"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -71,6 +72,12 @@ func Chain(middlewares ...Middleware) Middleware {
 		}
 		return final
 	}
+}
+
+// WithAuthAndChannel combines authentication and channel membership check.
+// Authenticates user first, then verifies they're a member of the required channel.
+func WithAuthAndChannel(next HandlerFunc) HandlerFunc {
+	return WithAuth(WithChannelMembership(next))
 }
 
 // --- Helpers ---
@@ -148,4 +155,99 @@ func getUserPhotoURL(ctx context.Context, b *bot.Bot, userID int64, botToken str
 
 	// Build direct URL: https://api.telegram.org/file/bot<token>/<file_path>
 	return "https://api.telegram.org/file/bot" + botToken + "/" + file.FilePath
+}
+
+// WithChannelMembership ensures the user is a member of the required channel.
+// If not a member, sends a join channel prompt and blocks the handler.
+func WithChannelMembership(next HandlerFunc) HandlerFunc {
+	return func(ctx context.Context, b *bot.Bot, u *models.Update, deps Deps) {
+		// Skip if no channel configured
+		if deps.RequiredChannel == "" {
+			next(ctx, b, u, deps)
+			return
+		}
+
+		user := getUserFromUpdate(u)
+		if user == nil {
+			next(ctx, b, u, deps)
+			return
+		}
+
+		// Check membership
+		isMember, err := isChannelMember(ctx, b, deps.RequiredChannel, user.ID)
+		if err != nil {
+			lg := logger.ForUser(user.ID)
+			lg.Warnf("Channel membership check failed: %v", err)
+			// Allow access on error (fail open) to avoid blocking users
+			next(ctx, b, u, deps)
+			return
+		}
+
+		if isMember {
+			next(ctx, b, u, deps)
+			return
+		}
+
+		// Not a member - send join prompt
+		sendJoinChannelPrompt(ctx, b, u, deps)
+	}
+}
+
+// isChannelMember checks if a user is a member of the specified channel.
+func isChannelMember(ctx context.Context, b *bot.Bot, channelUsername string, userID int64) (bool, error) {
+	member, err := b.GetChatMember(ctx, &bot.GetChatMemberParams{
+		ChatID: channelUsername,
+		UserID: userID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	// Check member status
+	switch member.Type {
+	case "member", "administrator", "creator":
+		return true, nil
+	case "left", "kicked", "restricted":
+		return false, nil
+	default:
+		return false, nil
+	}
+}
+
+// sendJoinChannelPrompt sends a message asking the user to join the channel.
+func sendJoinChannelPrompt(ctx context.Context, b *bot.Bot, u *models.Update, deps Deps) {
+	chatID := getChatIDFromUpdate(u)
+	if chatID == 0 {
+		return
+	}
+
+	user := getUserFromUpdate(u)
+	lang := "en"
+	if user != nil {
+		// Try to get saved language
+		if savedLang := deps.Sessions.GetLang(user.ID); savedLang != "" {
+			lang = savedLang
+		} else if user.LanguageCode != "" {
+			lang = user.LanguageCode
+		}
+	}
+
+	loc := i18n.Localizer(lang)
+
+	// Build channel URL from username
+	channelURL := "https://t.me/" + deps.RequiredChannel[1:] // Remove @ prefix
+
+	keyboard := &models.InlineKeyboardMarkup{
+		InlineKeyboard: [][]models.InlineKeyboardButton{
+			{
+				{Text: i18n.T(loc, "join_channel_button"), URL: channelURL},
+			},
+		},
+	}
+
+	_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:      chatID,
+		Text:        i18n.T(loc, "join_channel_required"),
+		ReplyMarkup: keyboard,
+	})
 }

@@ -23,13 +23,14 @@ type Config struct {
 
 // Dependencies holds external services the bot needs.
 type Dependencies struct {
-	Auth         *core.AuthService
-	Subscription *core.SubscriptionService
-	WebAppURL    string
-	APIBaseURL   string
-	BotToken     string
-	BotNames     map[string]string
-	Sessions     auth.SessionStore
+	Auth            *core.AuthService
+	Subscription    *core.SubscriptionService
+	WebAppURL       string
+	APIBaseURL      string
+	BotToken        string
+	BotNames        map[string]string
+	Sessions        auth.SessionStore
+	RequiredChannel string
 }
 
 // NewBot creates and configures a new Telegram bot instance.
@@ -40,14 +41,15 @@ func NewBot(token string, deps Dependencies, cfg Config) (*bot.Bot, error) {
 
 	// Create shared deps
 	sharedDeps := commands.Deps{
-		Auth:         deps.Auth,
-		Subscription: deps.Subscription,
-		WebAppURL:    deps.WebAppURL,
-		BotToken:     token,
-		BotNames:     deps.BotNames,
-		API:          api.NewClient(deps.APIBaseURL, 10*time.Second),
-		AuthClient:   auth.NewClient(deps.APIBaseURL, token),
-		Sessions:     deps.Sessions,
+		Auth:            deps.Auth,
+		Subscription:    deps.Subscription,
+		WebAppURL:       deps.WebAppURL,
+		BotToken:        token,
+		BotNames:        deps.BotNames,
+		API:             api.NewClient(deps.APIBaseURL, 10*time.Second),
+		AuthClient:      auth.NewClient(deps.APIBaseURL, token),
+		Sessions:        deps.Sessions,
+		RequiredChannel: deps.RequiredChannel,
 	}
 
 	// Configure bot options
@@ -91,14 +93,14 @@ func clearBotUI(ctx context.Context, b *bot.Bot) {
 }
 
 func registerCommands(b *bot.Bot, deps commands.Deps) {
-	// /start handles its own auth (special first-time user flow)
+	// /start handles its own auth and channel check (special first-time user flow)
 	register(b, "/start", users.HandleStart, deps)
 
-	// Commands with authentication middleware
-	register(b, "/status", commands.WithAuth(users.HandleStatus), deps)
-	register(b, "/lang", commands.WithAuth(users.HandleLanguage), deps)
+	// Commands with authentication + channel membership middleware
+	register(b, "/status", commands.WithAuthAndChannel(users.HandleStatus), deps)
+	register(b, "/lang", commands.WithAuthAndChannel(users.HandleLanguage), deps)
 
-	// Admin commands
+	// Admin commands (no channel check for admins)
 	register(b, "/start_admin", admins.HandleStart, deps)
 }
 

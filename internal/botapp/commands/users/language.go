@@ -64,11 +64,69 @@ func HandleLanguageCallback(ctx context.Context, b *bot.Bot, u *models.Update, d
 	// Delete the language selection message
 	deleteMessage(ctx, b, cb)
 
-	// Send welcome message with image
+	// Check channel membership before showing welcome
+	if deps.RequiredChannel != "" {
+		isMember, err := isChannelMember(ctx, b, deps.RequiredChannel, cb.From.ID)
+		if err != nil {
+			lg.Warnf("Channel check failed: %v", err)
+			// Fail open - show welcome
+		} else if !isMember {
+			// Not a member - send join prompt
+			sendJoinChannelPrompt(ctx, b, cb.From.ID, lang, deps)
+			lg.Infof("Language changed to %s (pending channel join)", lang)
+			return
+		}
+	}
+
+	// Member (or no channel required) - send welcome message
+	sendWelcomeMessage(ctx, b, cb.From.ID, lang, deps, lg)
+	lg.Infof("Language changed to %s", lang)
+}
+
+// sendJoinChannelPrompt sends a localized message asking user to join the channel.
+func sendJoinChannelPrompt(ctx context.Context, b *bot.Bot, chatID int64, lang string, deps commands.Deps) {
+	loc := i18n.Localizer(lang)
+	channelURL := "https://t.me/" + deps.RequiredChannel[1:] // Remove @ prefix
+
+	keyboard := &models.InlineKeyboardMarkup{
+		InlineKeyboard: [][]models.InlineKeyboardButton{
+			{
+				{Text: i18n.T(loc, "join_channel_button"), URL: channelURL},
+			},
+		},
+	}
+
+	_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:      chatID,
+		Text:        i18n.T(loc, "join_channel_required"),
+		ReplyMarkup: keyboard,
+	})
+}
+
+// isChannelMember checks if a user is a member of the specified channel.
+func isChannelMember(ctx context.Context, b *bot.Bot, channelUsername string, userID int64) (bool, error) {
+	member, err := b.GetChatMember(ctx, &bot.GetChatMemberParams{
+		ChatID: channelUsername,
+		UserID: userID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	switch member.Type {
+	case "member", "administrator", "creator":
+		return true, nil
+	default:
+		return false, nil
+	}
+}
+
+// sendWelcomeMessage sends the welcome message with image.
+func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang string, deps commands.Deps, lg logger.TgLogger) {
 	loc := i18n.Localizer(lang)
 	botName := deps.BotNames[lang]
 	if botName == "" {
-		botName = deps.BotNames["en"] // fallback
+		botName = deps.BotNames["en"]
 	}
 	welcome := i18n.TWithData(loc, "welcome", map[string]any{"BotName": botName})
 	caption := welcome + "\n\n" + i18n.T(loc, "select_option")
@@ -77,19 +135,17 @@ func HandleLanguageCallback(ctx context.Context, b *bot.Bot, u *models.Update, d
 	if err != nil {
 		lg.Errorf("Failed to open welcome image: %v", err)
 		_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: cb.From.ID,
+			ChatID: chatID,
 			Text:   caption,
 		})
 	} else {
 		defer photo.Close()
 		_, _ = b.SendPhoto(ctx, &bot.SendPhotoParams{
-			ChatID:  cb.From.ID,
+			ChatID:  chatID,
 			Photo:   &models.InputFileUpload{Filename: "welcome.jpg", Data: photo},
 			Caption: caption,
 		})
 	}
-
-	lg.Infof("Language changed to %s", lang)
 }
 
 // --- Helpers ---

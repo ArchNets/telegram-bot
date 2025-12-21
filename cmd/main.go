@@ -50,13 +50,14 @@ func main() {
 
 	// Dependencies for the bot layer
 	deps := botapp.Dependencies{
-		Auth:         authSvc,
-		Subscription: subSvc,
-		WebAppURL:    cfg.WebAppURL,
-		APIBaseURL:   cfg.APIBaseURL,
-		BotToken:     cfg.BotToken,
-		BotNames:     cfg.BotNames,
-		Sessions:     sessions,
+		Auth:            authSvc,
+		Subscription:    subSvc,
+		WebAppURL:       cfg.WebAppURL,
+		APIBaseURL:      cfg.APIBaseURL,
+		BotToken:        cfg.BotToken,
+		BotNames:        cfg.BotNames,
+		Sessions:        sessions,
+		RequiredChannel: cfg.RequiredChannel,
 	}
 
 	// Bot configuration

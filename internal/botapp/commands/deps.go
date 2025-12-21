@@ -19,7 +19,8 @@ type Deps struct {
 	BotNames  map[string]string
 
 	// API and auth
-	API        *api.Client
-	AuthClient *auth.Client
-	Sessions   auth.SessionStore
+	API             *api.Client
+	AuthClient      *auth.Client
+	Sessions        auth.SessionStore
+	RequiredChannel string // Channel username users must join (e.g., "@Arch_Net")
 }

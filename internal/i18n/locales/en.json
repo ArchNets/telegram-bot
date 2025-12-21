@@ -34,5 +34,14 @@
     },
     "auth_error": {
         "other": "❌ Authentication error. Please try again."
+    },
+    "join_channel_required": {
+        "other": "📢 To use this bot, please join our channel first:"
+    },
+    "join_channel_button": {
+        "other": "Join Channel"
+    },
+    "not_member_yet": {
+        "other": "⚠️ You haven't joined the channel yet. Please join to continue using the bot."
     }
 }

@@ -2,12 +2,10 @@ package users
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/archnets/telegram-bot/internal/auth"
 	"github.com/archnets/telegram-bot/internal/botapp/commands"
-	"github.com/archnets/telegram-bot/internal/i18n"
 	"github.com/archnets/telegram-bot/internal/logger"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -37,35 +35,22 @@ func HandleStart(ctx context.Context, b *bot.Bot, u *models.Update, deps command
 		return
 	}
 
-	// Returning users: show welcome message
-	loc := i18n.Localizer(savedLang)
-	botName := deps.BotNames[savedLang]
-	if botName == "" {
-		botName = deps.BotNames["en"]
-	}
-	welcome := i18n.TWithData(loc, "welcome", map[string]any{"BotName": botName})
-	caption := welcome + "\n\n" + i18n.T(loc, "select_option")
-
-	// Send welcome image with caption
-	photo, err := os.Open("assets/welcome.jpg")
-	if err != nil {
-		lg.Errorf("Failed to open welcome image: %v", err)
-		// Fallback to text message
-		_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:      u.Message.Chat.ID,
-			Text:        caption,
-			ReplyMarkup: &models.ReplyKeyboardRemove{RemoveKeyboard: true},
-		})
-	} else {
-		defer photo.Close()
-		_, _ = b.SendPhoto(ctx, &bot.SendPhotoParams{
-			ChatID:      u.Message.Chat.ID,
-			Photo:       &models.InputFileUpload{Filename: "welcome.jpg", Data: photo},
-			Caption:     caption,
-			ReplyMarkup: &models.ReplyKeyboardRemove{RemoveKeyboard: true},
-		})
+	// Returning users: check channel membership first
+	if deps.RequiredChannel != "" {
+		isMember, err := isChannelMember(ctx, b, deps.RequiredChannel, user.ID)
+		if err != nil {
+			lg.Warnf("Channel check failed: %v", err)
+			// Fail open - show welcome
+		} else if !isMember {
+			// Not a member - send join prompt
+			sendJoinChannelPrompt(ctx, b, u.Message.Chat.ID, savedLang, deps)
+			lg.Infof("Start command handled (pending channel join)")
+			return
+		}
 	}
 
+	// Member (or no channel required) - show welcome message
+	sendWelcomeMessage(ctx, b, u.Message.Chat.ID, savedLang, deps, lg)
 	lg.Infof("Start command handled")
 }
 
