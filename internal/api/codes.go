@@ -50,6 +50,13 @@ const (
 	InsufficientOfPeriod  = 61004
 	ExistAvailableTraffic = 61005
 
+	// Order Status Codes
+	OrderStatusPending  = 1 // Order created but not paid (Pending)
+	OrderStatusPaid     = 2 // Order paid and ready for processing
+	OrderStatusClose    = 3 // Order closed/cancelled
+	OrderStatusFailed   = 4 // Order processing failed
+	OrderStatusFinished = 5 // Order successfully completed (Finished)
+
 	// Coupon Errors
 	CouponNotExist          = 50001
 	CouponAlreadyUsed       = 50002

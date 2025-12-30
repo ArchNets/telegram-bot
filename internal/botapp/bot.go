@@ -111,6 +111,49 @@ func registerCallbacks(b *bot.Bot, deps commands.Deps) {
 		bot.MatchTypePrefix,
 		wrapHandler(commands.WithAuth(users.HandleLanguageCallback), deps),
 	)
+
+	b.RegisterHandler(
+		bot.HandlerTypeCallbackQueryData,
+		"menu:",
+		bot.MatchTypePrefix,
+		wrapHandler(commands.WithAuth(users.HandleMenuCallback), deps),
+	)
+
+	b.RegisterHandler(
+		bot.HandlerTypeCallbackQueryData,
+		"settings:",
+		bot.MatchTypePrefix,
+		wrapHandler(commands.WithAuth(users.HandleSettingsCallback), deps),
+	)
+
+	// Purchase flow callbacks
+	b.RegisterHandler(
+		bot.HandlerTypeCallbackQueryData,
+		"plan:",
+		bot.MatchTypePrefix,
+		wrapHandler(commands.WithAuth(users.HandlePlanCallback), deps),
+	)
+
+	b.RegisterHandler(
+		bot.HandlerTypeCallbackQueryData,
+		"qty:",
+		bot.MatchTypePrefix,
+		wrapHandler(commands.WithAuth(users.HandleQuantityCallback), deps),
+	)
+
+	b.RegisterHandler(
+		bot.HandlerTypeCallbackQueryData,
+		"pay:",
+		bot.MatchTypePrefix,
+		wrapHandler(commands.WithAuth(users.HandlePaymentCallback), deps),
+	)
+
+	b.RegisterHandler(
+		bot.HandlerTypeCallbackQueryData,
+		"order:",
+		bot.MatchTypePrefix,
+		wrapHandler(commands.WithAuth(users.HandleOrderCallback), deps),
+	)
 }
 
 func register(b *bot.Bot, command string, handler commands.HandlerFunc, deps commands.Deps) {

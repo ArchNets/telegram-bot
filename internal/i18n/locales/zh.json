@@ -43,5 +43,140 @@
     },
     "not_member_yet": {
         "other": "⚠️ 您尚未加入频道。请加入以继续使用机器人。"
+    },
+    "btn_my_services": {
+        "other": "📦 我的服务"
+    },
+    "btn_buy_service": {
+        "other": "🛒 购买服务"
+    },
+    "btn_balance": {
+        "other": "💰 余额"
+    },
+    "btn_invitation": {
+        "other": "👥 邀请"
+    },
+    "btn_prices": {
+        "other": "💎 价格"
+    },
+    "btn_support": {
+        "other": "🎧 支持"
+    },
+    "btn_settings": {
+        "other": "⚙️ 设置"
+    },
+    "btn_back": {
+        "other": "◀️ 返回"
+    },
+    "btn_change_language": {
+        "other": "🌐 更改语言"
+    },
+    "your_services": {
+        "other": "📦 *您的服务*"
+    },
+    "no_services": {
+        "other": "📭 您没有任何活跃的服务。\n\n点击'购买服务'开始使用！"
+    },
+    "error_loading_services": {
+        "other": "❌ 加载服务时出错。请重试。"
+    },
+    "traffic": {
+        "other": "流量"
+    },
+    "expires": {
+        "other": "到期"
+    },
+    "available_plans": {
+        "other": "🛒 *可用套餐*"
+    },
+    "no_plans_available": {
+        "other": "📭 目前没有可用的套餐。"
+    },
+    "error_loading_plans": {
+        "other": "❌ 加载套餐时出错。请重试。"
+    },
+    "price": {
+        "other": "价格"
+    },
+    "duration": {
+        "other": "时长"
+    },
+    "days": {
+        "other": "天"
+    },
+    "buy_instructions": {
+        "other": "💡 请访问我们的网站购买套餐。"
+    },
+    "balance_info": {
+        "other": "💰 *您的余额*\n\n💵 余额：{{.Balance}}"
+    },
+    "error_loading_balance": {
+        "other": "❌ 加载余额时出错。请重试。"
+    },
+    "invite_info": {
+        "other": "👥 *邀请计划*\n\n🔗 您的推荐码：`{{.ReferCode}}`\n\n📊 统计：\n   👤 总邀请人数：{{.Registers}}\n   💰 总收益：{{.TotalCommission}}"
+    },
+    "error_loading_invite": {
+        "other": "❌ 加载邀请信息时出错。请重试。"
+    },
+    "support_info": {
+        "other": "🎧 *支持*\n\n如需帮助，请访问我们的网站或通过面板创建工单。\n\n📧 邮箱：support@archnet.io"
+    },
+    "settings_menu": {
+        "other": "⚙️ *设置*\n\n请选择以下选项："
+    },
+    "plan_details": {
+        "other": "🛒 *{{.Name}}*\n\n💵 价格：{{.Price}}\n📊 流量：{{.Traffic}} GB\n📅 时长：{{.Duration}}\n📱 设备：{{.Devices}}"
+    },
+    "plan_page": {
+        "other": "套餐 {{.Current}}/{{.Total}}"
+    },
+    "btn_select_plan": {
+        "other": "✅ 选择此套餐"
+    },
+    "btn_prev": {
+        "other": "◀️ 上一个"
+    },
+    "btn_next": {
+        "other": "下一个 ▶️"
+    },
+    "select_quantity": {
+        "other": "📅 *选择时长*\n\n套餐：{{.PlanName}}\n\n请选择月数："
+    },
+    "btn_month": {
+        "other": "{{.Months}} 个月"
+    },
+    "btn_months": {
+        "other": "{{.Months}} 个月"
+    },
+    "select_payment": {
+        "other": "💳 *选择支付方式*\n\n套餐：{{.PlanName}}\n时长：{{.Months}} 个月\n\n请选择支付方式："
+    },
+    "confirm_order": {
+        "other": "📋 *订单摘要*\n\n📦 套餐：{{.PlanName}}\n📅 时长：{{.Months}} 个月\n💳 支付：{{.PaymentName}}\n\n💰 总计：{{.Total}}"
+    },
+    "btn_confirm": {
+        "other": "✅ 确认并支付"
+    },
+    "btn_cancel": {
+        "other": "❌ 取消"
+    },
+    "order_created": {
+        "other": "✅ *订单已创建！*\n\n订单号：`{{.OrderNo}}`\n\n点击下方按钮完成支付："
+    },
+    "btn_pay_now": {
+        "other": "💳 立即支付"
+    },
+    "error_creating_order": {
+        "other": "❌ 创建订单时出错。请重试。"
+    },
+    "error_loading_payments": {
+        "other": "❌ 加载支付方式时出错。请重试。"
+    },
+    "order_cancelled": {
+        "other": "❌ 订单已取消。"
+    },
+    "order_created_balance": {
+        "other": "✅ *订单已创建并支付！*\n\n订单号：`{{.OrderNo}}`\n\n付款已从您的余额中扣除。您的订阅现已生效！"
     }
 }

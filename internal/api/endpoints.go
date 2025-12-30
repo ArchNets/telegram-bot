@@ -30,4 +30,19 @@ const (
 	EndpointBindEmail    = "/v1/public/user/bind_email"
 	EndpointBindMobile   = "/v1/public/user/bind_mobile"
 	EndpointBindOAuth    = "/v1/public/user/bind_oauth"
+
+	// Subscribe catalog endpoints
+	EndpointSubscribeList = "/v1/public/subscribe/list"
+
+	// Affiliate endpoints
+	EndpointAffiliateCount = "/v1/public/user/affiliate/count"
+
+	// Payment endpoints
+	EndpointPaymentMethods = "/v1/public/payment/methods"
+
+	// Order endpoints
+	EndpointOrderPre      = "/v1/public/order/pre"
+	EndpointOrderPurchase = "/v1/public/order/purchase"
+	EndpointOrderDetail   = "/v1/public/order/detail"
+	EndpointOrderCheckout = "/v1/public/portal/order/checkout"
 )

@@ -121,7 +121,7 @@ func isChannelMember(ctx context.Context, b *bot.Bot, channelUsername string, us
 	}
 }
 
-// sendWelcomeMessage sends the welcome message with image.
+// sendWelcomeMessage sends the welcome message with image and menu keyboard.
 func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang string, deps commands.Deps, lg logger.TgLogger) {
 	loc := i18n.Localizer(lang)
 	botName := deps.BotNames[lang]
@@ -130,20 +130,23 @@ func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang stri
 	}
 	welcome := i18n.TWithData(loc, "welcome", map[string]any{"BotName": botName})
 	caption := welcome + "\n\n" + i18n.T(loc, "select_option")
+	keyboard := buildMainMenuKeyboard(lang)
 
 	photo, err := os.Open("assets/welcome.jpg")
 	if err != nil {
 		lg.Errorf("Failed to open welcome image: %v", err)
 		_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: chatID,
-			Text:   caption,
+			ChatID:      chatID,
+			Text:        caption,
+			ReplyMarkup: keyboard,
 		})
 	} else {
 		defer photo.Close()
 		_, _ = b.SendPhoto(ctx, &bot.SendPhotoParams{
-			ChatID:  chatID,
-			Photo:   &models.InputFileUpload{Filename: "welcome.jpg", Data: photo},
-			Caption: caption,
+			ChatID:      chatID,
+			Photo:       &models.InputFileUpload{Filename: "welcome.jpg", Data: photo},
+			Caption:     caption,
+			ReplyMarkup: keyboard,
 		})
 	}
 }
