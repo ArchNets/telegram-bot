@@ -72,8 +72,8 @@ func NewBot(token string, deps Dependencies, cfg Config) (*bot.Bot, error) {
 		return nil, err
 	}
 
-	// Clear bot UI elements (commands menu, menu button)
-	clearBotUI(context.Background(), b)
+	// Setup bot UI elements (WebApp menu button)
+	setupBotUI(context.Background(), b, deps)
 
 	registerCommands(b, sharedDeps)
 	registerCallbacks(b, sharedDeps)
@@ -81,15 +81,21 @@ func NewBot(token string, deps Dependencies, cfg Config) (*bot.Bot, error) {
 	return b, nil
 }
 
-// clearBotUI removes commands list and menu button from Telegram UI.
-func clearBotUI(ctx context.Context, b *bot.Bot) {
+// setupBotUI configures menu button as WebApp and clears commands.
+func setupBotUI(ctx context.Context, b *bot.Bot, deps Dependencies) {
 	// Delete all commands from the / menu
 	_, _ = b.DeleteMyCommands(ctx, &bot.DeleteMyCommandsParams{})
 
-	// Set menu button to "commands" type (removes WebApp button)
-	_, _ = b.SetChatMenuButton(ctx, &bot.SetChatMenuButtonParams{
-		MenuButton: &models.MenuButtonCommands{Type: "commands"},
-	})
+	// Set menu button to WebApp type (if WebAppURL is configured)
+	if deps.WebAppURL != "" {
+		_, _ = b.SetChatMenuButton(ctx, &bot.SetChatMenuButtonParams{
+			MenuButton: &models.MenuButtonWebApp{
+				Type:   "web_app",
+				Text:   deps.BotNames["en"], // Use English name for menu button
+				WebApp: models.WebAppInfo{URL: deps.WebAppURL},
+			},
+		})
+	}
 }
 
 func registerCommands(b *bot.Bot, deps commands.Deps) {
@@ -112,48 +118,6 @@ func registerCallbacks(b *bot.Bot, deps commands.Deps) {
 		wrapHandler(commands.WithAuth(users.HandleLanguageCallback), deps),
 	)
 
-	b.RegisterHandler(
-		bot.HandlerTypeCallbackQueryData,
-		"menu:",
-		bot.MatchTypePrefix,
-		wrapHandler(commands.WithAuth(users.HandleMenuCallback), deps),
-	)
-
-	b.RegisterHandler(
-		bot.HandlerTypeCallbackQueryData,
-		"settings:",
-		bot.MatchTypePrefix,
-		wrapHandler(commands.WithAuth(users.HandleSettingsCallback), deps),
-	)
-
-	// Purchase flow callbacks
-	b.RegisterHandler(
-		bot.HandlerTypeCallbackQueryData,
-		"plan:",
-		bot.MatchTypePrefix,
-		wrapHandler(commands.WithAuth(users.HandlePlanCallback), deps),
-	)
-
-	b.RegisterHandler(
-		bot.HandlerTypeCallbackQueryData,
-		"qty:",
-		bot.MatchTypePrefix,
-		wrapHandler(commands.WithAuth(users.HandleQuantityCallback), deps),
-	)
-
-	b.RegisterHandler(
-		bot.HandlerTypeCallbackQueryData,
-		"pay:",
-		bot.MatchTypePrefix,
-		wrapHandler(commands.WithAuth(users.HandlePaymentCallback), deps),
-	)
-
-	b.RegisterHandler(
-		bot.HandlerTypeCallbackQueryData,
-		"order:",
-		bot.MatchTypePrefix,
-		wrapHandler(commands.WithAuth(users.HandleOrderCallback), deps),
-	)
 }
 
 func register(b *bot.Bot, command string, handler commands.HandlerFunc, deps commands.Deps) {

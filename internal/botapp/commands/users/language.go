@@ -121,16 +121,32 @@ func isChannelMember(ctx context.Context, b *bot.Bot, channelUsername string, us
 	}
 }
 
-// sendWelcomeMessage sends the welcome message with image and menu keyboard.
+// sendWelcomeMessage sends the welcome message with image and WebApp button.
 func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang string, deps commands.Deps, lg logger.TgLogger) {
 	loc := i18n.Localizer(lang)
-	botName := deps.BotNames[lang]
-	if botName == "" {
-		botName = deps.BotNames["en"]
+
+	// Button text: Persian gets FA name, all others get EN
+	botName := deps.BotNames["en"]
+	if lang == "fa" {
+		botName = deps.BotNames["fa"]
 	}
 	welcome := i18n.TWithData(loc, "welcome", map[string]any{"BotName": botName})
-	caption := welcome + "\n\n" + i18n.T(loc, "select_option")
-	keyboard := buildMainMenuKeyboard(lang)
+	caption := welcome
+
+	// Create WebApp inline keyboard button
+	var replyMarkup models.ReplyMarkup
+	if deps.WebAppURL != "" {
+		replyMarkup = &models.InlineKeyboardMarkup{
+			InlineKeyboard: [][]models.InlineKeyboardButton{
+				{
+					{
+						Text:   botName,
+						WebApp: &models.WebAppInfo{URL: deps.WebAppURL},
+					},
+				},
+			},
+		}
+	}
 
 	photo, err := os.Open("assets/welcome.jpg")
 	if err != nil {
@@ -138,7 +154,7 @@ func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang stri
 		_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      chatID,
 			Text:        caption,
-			ReplyMarkup: keyboard,
+			ReplyMarkup: replyMarkup,
 		})
 	} else {
 		defer photo.Close()
@@ -146,7 +162,7 @@ func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang stri
 			ChatID:      chatID,
 			Photo:       &models.InputFileUpload{Filename: "welcome.jpg", Data: photo},
 			Caption:     caption,
-			ReplyMarkup: keyboard,
+			ReplyMarkup: replyMarkup,
 		})
 	}
 }
@@ -192,15 +208,15 @@ func answerCallback(ctx context.Context, b *bot.Bot, id, text string, alert bool
 	})
 }
 
-func editMessage(ctx context.Context, b *bot.Bot, cb *models.CallbackQuery, text string) {
-	if cb.Message.Message != nil {
-		_, _ = b.EditMessageText(ctx, &bot.EditMessageTextParams{
-			ChatID:    cb.Message.Message.Chat.ID,
-			MessageID: cb.Message.Message.ID,
-			Text:      text,
-		})
-	}
-}
+// func editMessage(ctx context.Context, b *bot.Bot, cb *models.CallbackQuery, text string) {
+// 	if cb.Message.Message != nil {
+// 		_, _ = b.EditMessageText(ctx, &bot.EditMessageTextParams{
+// 			ChatID:    cb.Message.Message.Chat.ID,
+// 			MessageID: cb.Message.Message.ID,
+// 			Text:      text,
+// 		})
+// 	}
+// }
 
 func deleteMessage(ctx context.Context, b *bot.Bot, cb *models.CallbackQuery) {
 	if cb.Message.Message != nil {

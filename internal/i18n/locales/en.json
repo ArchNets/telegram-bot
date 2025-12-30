@@ -1,36 +1,12 @@
 {
     "welcome": {
-        "other": "🐉 Hello and welcome to {{.BotName}} bot 👋"
-    },
-    "select_option": {
-        "other": "📌 Please select one of the options below to use the bot"
-    },
-    "click_login": {
-        "other": "📍 Click the button below to login to panel."
-    },
-    "login_button": {
-        "other": "Login to Panel"
-    },
-    "unknown_command": {
-        "other": "Unknown command. Try /start"
-    },
-    "admin_welcome": {
-        "other": "Welcome back, Admin! 👋"
-    },
-    "admin_commands": {
-        "other": "Available commands:\n/status - Check system status\n/configs - View configurations\n/webapp - Open web panel"
-    },
-    "access_denied": {
-        "other": "⛔ Access denied. You are not an admin."
-    },
-    "status_unavailable": {
-        "other": "Status is under construction 🚧"
+        "other": "🐉 Hello and welcome to {{.BotName}} 👋\n\nClick the button below to open the app and get started!"
     },
     "choose_language": {
         "other": "🌐 Please choose your language:"
     },
-    "language_saved": {
-        "other": "✅ Language preference saved!"
+    "unknown_command": {
+        "other": "Unknown command. Try /start"
     },
     "auth_error": {
         "other": "❌ Authentication error. Please try again."
@@ -41,145 +17,16 @@
     "join_channel_button": {
         "other": "Join Channel"
     },
-    "not_member_yet": {
-        "other": "⚠️ You haven't joined the channel yet. Please join to continue using the bot."
+    "status_unavailable": {
+        "other": "Status is under construction 🚧"
     },
-    "btn_my_services": {
-        "other": "📦 My Services"
+    "admin_welcome": {
+        "other": "Welcome back, Admin! 👋"
     },
-    "btn_buy_service": {
-        "other": "🛒 Buy Service"
+    "admin_commands": {
+        "other": "Available commands:\n/status - Check system status\n/configs - View configurations\n/webapp - Open web panel"
     },
-    "btn_balance": {
-        "other": "💰 Balance"
-    },
-    "btn_invitation": {
-        "other": "👥 Invitation"
-    },
-    "btn_prices": {
-        "other": "💎 Prices"
-    },
-    "btn_support": {
-        "other": "🎧 Support"
-    },
-    "btn_settings": {
-        "other": "⚙️ Settings"
-    },
-    "btn_back": {
-        "other": "◀️ Back"
-    },
-    "btn_change_language": {
-        "other": "🌐 Change Language"
-    },
-    "your_services": {
-        "other": "📦 *Your Services*"
-    },
-    "no_services": {
-        "other": "📭 You don't have any active services.\n\nClick 'Buy Service' to get started!"
-    },
-    "error_loading_services": {
-        "other": "❌ Error loading services. Please try again."
-    },
-    "traffic": {
-        "other": "Traffic"
-    },
-    "expires": {
-        "other": "Expires"
-    },
-    "available_plans": {
-        "other": "🛒 *Available Plans*"
-    },
-    "no_plans_available": {
-        "other": "📭 No plans available at the moment."
-    },
-    "error_loading_plans": {
-        "other": "❌ Error loading plans. Please try again."
-    },
-    "price": {
-        "other": "Price"
-    },
-    "duration": {
-        "other": "Duration"
-    },
-    "days": {
-        "other": "days"
-    },
-    "buy_instructions": {
-        "other": "💡 Visit our website to purchase a plan."
-    },
-    "balance_info": {
-        "other": "💰 *Your Balance*\n\n💵 Balance: {{.Balance}}"
-    },
-    "error_loading_balance": {
-        "other": "❌ Error loading balance. Please try again."
-    },
-    "invite_info": {
-        "other": "👥 *Invitation Program*\n\n🔗 Your referral code: `{{.ReferCode}}`\n\n📊 Statistics:\n   👤 Total invites: {{.Registers}}\n   💰 Total earned: {{.TotalCommission}}"
-    },
-    "error_loading_invite": {
-        "other": "❌ Error loading invitation info. Please try again."
-    },
-    "support_info": {
-        "other": "🎧 *Support*\n\nFor support, please visit our website or create a ticket through the panel.\n\n📧 Email: support@archnet.io"
-    },
-    "settings_menu": {
-        "other": "⚙️ *Settings*\n\nChoose an option below:"
-    },
-    "plan_details": {
-        "other": "🛒 *{{.Name}}*\n\n💵 Price: {{.Price}}\n📊 Traffic: {{.Traffic}} GB\n📅 Duration: {{.Duration}}\n📱 Devices: {{.Devices}}"
-    },
-    "plan_page": {
-        "other": "Plan {{.Current}} of {{.Total}}"
-    },
-    "btn_select_plan": {
-        "other": "✅ Select This Plan"
-    },
-    "btn_prev": {
-        "other": "◀️ Prev"
-    },
-    "btn_next": {
-        "other": "Next ▶️"
-    },
-    "select_quantity": {
-        "other": "📅 *Select Duration*\n\nPlan: {{.PlanName}}\n\nChoose how many months:"
-    },
-    "btn_month": {
-        "other": "{{.Months}} month"
-    },
-    "btn_months": {
-        "other": "{{.Months}} months"
-    },
-    "select_payment": {
-        "other": "💳 *Select Payment Method*\n\nPlan: {{.PlanName}}\nDuration: {{.Months}} month(s)\n\nChoose payment method:"
-    },
-    "confirm_order": {
-        "other": "📋 *Order Summary*\n\n📦 Plan: {{.PlanName}}\n📅 Duration: {{.Months}} month(s)\n💳 Payment: {{.PaymentName}}\n\n💰 Total: {{.Total}}"
-    },
-    "btn_confirm": {
-        "other": "✅ Confirm & Pay"
-    },
-    "btn_cancel": {
-        "other": "❌ Cancel"
-    },
-    "order_created": {
-        "other": "✅ *Order Created!*\n\nOrder Number: `{{.OrderNo}}`\n\nClick the button below to complete payment:"
-    },
-    "btn_pay_now": {
-        "other": "💳 Pay Now"
-    },
-    "error_creating_order": {
-        "other": "❌ Error creating order. Please try again."
-    },
-    "error_loading_payments": {
-        "other": "❌ Error loading payment methods. Please try again."
-    },
-    "order_cancelled": {
-        "other": "❌ Order cancelled."
-    },
-    "order_created_balance": {
-        "other": "✅ *Order Created & Paid!*\n\nOrder Number: `{{.OrderNo}}`\n\nPayment was deducted from your balance. Your subscription is now active!"
-    },
-    "order_pending": {
-        "other": "⏳ *Order Created*\n\nOrder Number: `{{.OrderNo}}`\n\nYour order is pending. Please complete the payment."
+    "access_denied": {
+        "other": "⛔ Access denied. You are not an admin."
     }
 }

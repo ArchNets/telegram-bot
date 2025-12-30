@@ -16,9 +16,6 @@ const (
 	EndpointUserDevices  = "/v1/public/user/devices"
 
 	// Subscription endpoints
-	EndpointUserSubscribe     = "/v1/public/user/subscribe"
-	EndpointUserSubscribeList = "/v1/public/user/subscribe/list"
-	EndpointUserTrafficLog    = "/v1/public/user/traffic_log"
 
 	// Ticket endpoints
 	EndpointTicket       = "/v1/public/ticket/"
@@ -32,17 +29,5 @@ const (
 	EndpointBindOAuth    = "/v1/public/user/bind_oauth"
 
 	// Subscribe catalog endpoints
-	EndpointSubscribeList = "/v1/public/subscribe/list"
 
-	// Affiliate endpoints
-	EndpointAffiliateCount = "/v1/public/user/affiliate/count"
-
-	// Payment endpoints
-	EndpointPaymentMethods = "/v1/public/payment/methods"
-
-	// Order endpoints
-	EndpointOrderPre      = "/v1/public/order/pre"
-	EndpointOrderPurchase = "/v1/public/order/purchase"
-	EndpointOrderDetail   = "/v1/public/order/detail"
-	EndpointOrderCheckout = "/v1/public/portal/order/checkout"
 )
