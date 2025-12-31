@@ -10,8 +10,8 @@ RUN apk update --no-cache && apk add --no-cache tzdata ca-certificates
 
 WORKDIR /build
 
-# Copy go.mod and go.sum first for caching
-COPY go.mod go.sum ./
+# Copy go.mod first for caching (go.sum is gitignored)
+COPY go.mod ./
 RUN go mod download
 
 # Copy source code
