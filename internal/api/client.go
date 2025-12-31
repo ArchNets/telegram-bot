@@ -135,14 +135,81 @@ func (c *Client) UpdateUserLanguage(ctx context.Context, token, lang string) err
 
 // --- Subscription Types ---
 
-// SubscribeDiscount represents quantity-based pricing tiers.
+// Subscribe represents subscription plan info
+type Subscribe struct {
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Traffic     int64  `json:"traffic"`
+}
 
-// SubscribePlan represents an available subscription plan (from /v1/public/subscribe/list).
+// UserSubscription represents user's active subscription
+type UserSubscription struct {
+	ID          int64     `json:"id"`
+	SubscribeID int64     `json:"subscribe_id"`
+	CustomName  string    `json:"custom_name"`
+	Traffic     int64     `json:"traffic"`
+	Download    int64     `json:"download"`
+	Upload      int64     `json:"upload"`
+	ExpireTime  int64     `json:"expire_time"` // Unix milliseconds
+	Status      int       `json:"status"`
+	Subscribe   Subscribe `json:"subscribe"`
+}
 
-// --- Subscription API Methods ---
+// UserSubscriptionsResponse response
+type UserSubscriptionsResponse struct {
+	List  []UserSubscription `json:"list"`
+	Total int64              `json:"total"`
+}
 
-// GetSubscribePlans fetches available subscription plans.
+// GetUserSubscriptions fetches user's active subscriptions
+func (c *Client) GetUserSubscriptions(ctx context.Context, token string) ([]UserSubscription, error) {
+	resp, err := c.Get(ctx, EndpointUserSubscribe, token)
+	if err != nil {
+		return nil, err
+	}
 
-// --- Payment Types ---
+	var result UserSubscriptionsResponse
+	if err := json.Unmarshal(resp.Data, &result); err != nil {
+		return nil, fmt.Errorf("unmarshal subscriptions: %w", err)
+	}
+	return result.List, nil
+}
 
-// PaymentMethod represents a payment option.
+// Login performs admin login to get backend access token.
+func (c *Client) Login(ctx context.Context, email, password string) (string, error) {
+	req := map[string]string{
+		"email":    email,
+		"password": password,
+	}
+	resp, err := c.Post(ctx, "/v1/auth/login", req, "")
+	if err != nil {
+		return "", err
+	}
+
+	var result struct {
+		Token string `json:"token"`
+	}
+	if err := json.Unmarshal(resp.Data, &result); err != nil {
+		return "", fmt.Errorf("unmarshal login response: %w", err)
+	}
+	return result.Token, nil
+}
+
+// GetAuthMethodConfig fetches authentication method configuration.
+func (c *Client) GetAuthMethodConfig(ctx context.Context, token, method string) (string, error) {
+	resp, err := c.Get(ctx, fmt.Sprintf("/v1/admin/auth-method/config?method=%s", method), token)
+	if err != nil {
+		return "", err
+	}
+
+	var result struct {
+		Config struct {
+			BotToken string `json:"bot_token"`
+		} `json:"config"`
+	}
+	if err := json.Unmarshal(resp.Data, &result); err != nil {
+		return "", fmt.Errorf("unmarshal auth method config: %w", err)
+	}
+	return result.Config.BotToken, nil
+}

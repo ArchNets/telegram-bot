@@ -1,32 +1,62 @@
 {
-    "welcome": {
-        "other": "🐉 Hello and welcome to {{.BotName}} 👋\n\nClick the button below to open the app and get started!"
-    },
-    "choose_language": {
-        "other": "🌐 Please choose your language:"
-    },
-    "unknown_command": {
-        "other": "Unknown command. Try /start"
-    },
-    "auth_error": {
-        "other": "❌ Authentication error. Please try again."
-    },
-    "join_channel_required": {
-        "other": "📢 To use this bot, please join our channel first:"
-    },
-    "join_channel_button": {
-        "other": "Join Channel"
-    },
-    "status_unavailable": {
-        "other": "Status is under construction 🚧"
-    },
-    "admin_welcome": {
-        "other": "Welcome back, Admin! 👋"
-    },
-    "admin_commands": {
-        "other": "Available commands:\n/status - Check system status\n/configs - View configurations\n/webapp - Open web panel"
-    },
-    "access_denied": {
-        "other": "⛔ Access denied. You are not an admin."
-    }
+  "welcome": {
+    "other": "🐉 Hello and welcome to {{.BotName}} 👋\n\nClick the button below to open the app and get started!"
+  },
+  "choose_language": {
+    "other": "🌐 Please choose your language:"
+  },
+  "unknown_command": {
+    "other": "Unknown command. Try /start"
+  },
+  "auth_error": {
+    "other": "❌ Authentication error. Please try again."
+  },
+  "join_channel_required": {
+    "other": "📢 To use this bot, please join our channel first:"
+  },
+  "join_channel_button": {
+    "other": "Join Channel"
+  },
+  "status_unavailable": {
+    "other": "Status is under construction 🚧"
+  },
+  "admin_welcome": {
+    "other": "Welcome back, Admin! 👋"
+  },
+  "admin_commands": {
+    "other": "Available commands:\n/status - Check system status\n/configs - View configurations\n/webapp - Open web panel"
+  },
+  "access_denied": {
+    "other": "⛔ Access denied. You are not an admin."
+  },
+  "server_offline": {
+    "other": "🔴 **Alert: Server Offline**\n\n🖥️ **Server Name**: {{.ServerName}}\n🌍 **Country**: {{.Country}}\n🏙️ **City**: {{.City}}\n⏰ **Last Report**: {{.LastReportedAt}}\n🕒 **Detected At**: {{.DetectedAt}}\n\n⚠️ Please check server status."
+  },
+  "server_online": {
+    "other": "🟢 **Server Online**\n\n🖥️ **Server Name**: {{.ServerName}}\n🌍 **Country**: {{.Country}}\n🏙️ **City**: {{.City}}\n⏰ **Online At**: {{.OnlineAt}}\n\n✅ Server successfully connected to network."
+  },
+  "purchase_success": {
+    "other": "🎉 **Your purchase was successful!**\n\n**Order Number**: {{.OrderNo}}\n**Plan Name**: {{.SubscribeName}}\n**Amount**: **{{.OrderAmount}}**\n**Expires At**: {{.ExpireTime}}\n\nThank you for your support! 💖"
+  },
+  "renewal_success": {
+    "other": "🎉 **Your subscription has been renewed!**\n\n**Order Number**: {{.OrderNo}}\n**Plan Name**: {{.SubscribeName}}\n**Amount**: **{{.OrderAmount}}**\n**Expires At**: {{.ExpireTime}}\n\nThank you for your support! 💖"
+  },
+  "recharge_success": {
+    "other": "💳 **Your balance recharge is complete!**\n\n💰 **Amount**: {{.OrderAmount}}\n🏦 **Payment Method**: {{.PaymentMethod}}\n⏰ **Time**: {{.Time}}\n📊 **Current Balance**: **{{.Balance}}**\n\nThank you for your support! 🎉"
+  },
+  "admin_order_notify": {
+    "other": "📦 **Order Notification**\n\n🆔 **Order No**: {{.OrderNo}}\n👤 **User**: {{.UserEmail}}\n💰 **Amount**: **{{.OrderAmount}}**\n📦 **Plan**: {{.SubscribeName}}\n💳 **Payment**: {{.PaymentMethod}}"
+  },
+  "traffic_title": {
+    "other": "📊 Your Traffic Usage"
+  },
+  "traffic_error": {
+    "other": "❌ Failed to fetch traffic data. Please try again."
+  },
+  "no_subscriptions": {
+    "other": "📭 No active subscriptions found."
+  },
+  "session_expired": {
+    "other": "⚠️ Your session has expired. Please use /start to login again."
+  }
 }

@@ -71,7 +71,10 @@ func (s *Store) GetToken(telegramID int64) string {
 
 // GetLang returns the cached language for a user.
 func (s *Store) GetLang(telegramID int64) string {
-	session, ok := s.Get(telegramID)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	session, ok := s.sessions[telegramID]
 	if !ok {
 		return ""
 	}

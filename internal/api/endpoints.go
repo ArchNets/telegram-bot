@@ -16,6 +16,7 @@ const (
 	EndpointUserDevices  = "/v1/public/user/devices"
 
 	// Subscription endpoints
+	EndpointUserSubscribe = "/v1/public/user/subscribe"
 
 	// Ticket endpoints
 	EndpointTicket       = "/v1/public/ticket/"

@@ -16,7 +16,8 @@ func DefaultHandler(ctx context.Context, b *bot.Bot, u *models.Update, deps comm
 	}
 
 	// Use saved language if available, otherwise Telegram's
-	lang := getLanguage(ctx, u.Message.From.ID, u.Message.From.LanguageCode, deps)
+	// Use saved language if available, otherwise Telegram's
+	lang := GetLanguage(ctx, u.Message.From.ID, u.Message.From.LanguageCode, deps)
 
 	// Unknown message
 	loc := i18n.Localizer(lang)

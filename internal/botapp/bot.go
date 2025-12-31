@@ -105,6 +105,7 @@ func registerCommands(b *bot.Bot, deps commands.Deps) {
 	// Commands with authentication + channel membership middleware
 	register(b, "/status", commands.WithAuthAndChannel(users.HandleStatus), deps)
 	register(b, "/lang", commands.WithAuthAndChannel(users.HandleLanguage), deps)
+	register(b, "/traffic", commands.WithAuthAndChannel(users.HandleTraffic), deps)
 
 	// Admin commands (no channel check for admins)
 	register(b, "/start_admin", admins.HandleStart, deps)

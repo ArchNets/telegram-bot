@@ -16,6 +16,8 @@ type Config struct {
 	BotDebug        bool
 	BotTimeoutS     int    // seconds for init timeout, e.g. 5
 	RequiredChannel string // channel users must join, e.g. "@Arch_Net"
+	AdminEmail      string
+	AdminPassword   string
 }
 
 func Load() Config {
@@ -42,5 +44,7 @@ func Load() Config {
 		BotDebug:        botDebug,
 		BotTimeoutS:     timeoutSec,
 		RequiredChannel: env.GetString("REQUIRED_CHANNEL", ""),
+		AdminEmail:      env.GetString("ADMIN_EMAIL", ""),
+		AdminPassword:   env.GetString("ADMIN_PASSWORD", ""),
 	}
 }

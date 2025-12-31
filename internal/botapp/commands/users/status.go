@@ -16,7 +16,8 @@ func HandleStatus(ctx context.Context, b *bot.Bot, u *models.Update, deps comman
 	}
 
 	// Use saved language if available, otherwise Telegram's
-	lang := getLanguage(ctx, u.Message.From.ID, u.Message.From.LanguageCode, deps)
+	// Use saved language if available, otherwise Telegram's
+	lang := GetLanguage(ctx, u.Message.From.ID, u.Message.From.LanguageCode, deps)
 	loc := i18n.Localizer(lang)
 
 	// TODO: Implement actual status logic

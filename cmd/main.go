@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/archnets/telegram-bot/internal/api"
 
 	"github.com/archnets/telegram-bot/config"
 	"github.com/archnets/telegram-bot/internal/auth"
@@ -23,13 +26,31 @@ func main() {
 
 	cfg := config.Load()
 
-	if cfg.BotToken == "" {
-		logger.Errorf("TELEGRAM_BOT_TOKEN is not set")
-		return
-	}
+	// Initialize database with migrations
+	// ...
 
 	if cfg.APIBaseURL == "" {
 		log.Println("WARNING: API_BASE_URL is empty. API calls will fail.")
+	}
+
+	// Fetch token from backend if not set in env (or override)
+	botToken := cfg.BotToken
+	if cfg.AdminEmail != "" && cfg.AdminPassword != "" {
+		logger.Infof("Fetching bot token from backend...")
+		token, err := bootstrapBotToken(ctx, cfg)
+		if err != nil {
+			logger.Errorf("Failed to fetch bot token: %v", err)
+			return
+		}
+		if token != "" {
+			botToken = token
+			logger.Infof("Successfully fetched bot token from backend")
+		}
+	}
+
+	if botToken == "" {
+		logger.Errorf("TELEGRAM_BOT_TOKEN is not set and could not be fetched from backend")
+		return
 	}
 
 	// Initialize database with migrations
@@ -54,7 +75,7 @@ func main() {
 		Subscription:    subSvc,
 		WebAppURL:       cfg.WebAppURL,
 		APIBaseURL:      cfg.APIBaseURL,
-		BotToken:        cfg.BotToken,
+		BotToken:        botToken,
 		BotNames:        cfg.BotNames,
 		Sessions:        sessions,
 		RequiredChannel: cfg.RequiredChannel,
@@ -67,7 +88,7 @@ func main() {
 	}
 
 	// Create Telegram bot
-	b, err := botapp.NewBot(cfg.BotToken, deps, botCfg)
+	b, err := botapp.NewBot(botToken, deps, botCfg)
 	if err != nil {
 		log.Fatalf("failed to create bot: %v", err)
 	}
@@ -75,4 +96,22 @@ func main() {
 	logger.Infof("Starting Telegram bot...")
 	b.Start(ctx)
 	logger.Infof("Bot stopped")
+}
+
+func bootstrapBotToken(ctx context.Context, cfg config.Config) (string, error) {
+	client := api.NewClient(cfg.APIBaseURL, 10*time.Second)
+
+	// Login to get admin token
+	adminToken, err := client.Login(ctx, cfg.AdminEmail, cfg.AdminPassword)
+	if err != nil {
+		return "", fmt.Errorf("admin login failed: %w", err)
+	}
+
+	// Fetch telegram config
+	botToken, err := client.GetAuthMethodConfig(ctx, adminToken, "telegram")
+	if err != nil {
+		return "", fmt.Errorf("fetch config failed: %w", err)
+	}
+
+	return botToken, nil
 }
