@@ -10,12 +10,14 @@ RUN apk update --no-cache && apk add --no-cache tzdata ca-certificates
 
 WORKDIR /build
 
-# Copy go.mod first for caching (go.sum is gitignored)
+# Copy go.mod first
 COPY go.mod ./
-RUN go mod download
 
 # Copy source code
 COPY . .
+
+# Download dependencies and generate go.sum
+RUN go mod tidy
 
 # Build the binary
 RUN go build -ldflags="-s -w" -o /app/telegram-bot ./cmd/main.go
