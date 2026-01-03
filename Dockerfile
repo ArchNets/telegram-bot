@@ -39,4 +39,7 @@ COPY --from=builder /app/telegram-bot /app/telegram-bot
 # Copy locale files for i18n
 COPY --from=builder /build/internal/i18n/locales /app/locales
 
+# Copy assets folder (images, etc.)
+COPY --from=builder /build/assets /app/assets
+
 ENTRYPOINT ["/app/telegram-bot"]
