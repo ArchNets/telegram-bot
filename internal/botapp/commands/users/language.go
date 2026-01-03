@@ -148,7 +148,7 @@ func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang stri
 		}
 	}
 
-	photo, err := os.Open("assets/welcome.jpg")
+	photo, err := os.Open("assets/welcome.png")
 	if err != nil {
 		lg.Errorf("Failed to open welcome image: %v", err)
 		_, _ = b.SendMessage(ctx, &bot.SendMessageParams{
@@ -160,7 +160,7 @@ func sendWelcomeMessage(ctx context.Context, b *bot.Bot, chatID int64, lang stri
 		defer photo.Close()
 		_, _ = b.SendPhoto(ctx, &bot.SendPhotoParams{
 			ChatID:      chatID,
-			Photo:       &models.InputFileUpload{Filename: "welcome.jpg", Data: photo},
+			Photo:       &models.InputFileUpload{Filename: "welcome.png", Data: photo},
 			Caption:     caption,
 			ReplyMarkup: replyMarkup,
 		})
