@@ -58,5 +58,8 @@
   },
   "session_expired": {
     "other": "⚠️ Your session has expired. Please use /start to login again."
+  },
+  "admin_broadcast_report": {
+    "other": "📢 **Broadcast Complete**\n\n📝 **Title**: {{.Title}}\n✅ **Sent**: **{{.Success}}**\n❌ **Failed**: **{{.Failed}}**\n👥 **Total**: {{.Total}}"
   }
 }
